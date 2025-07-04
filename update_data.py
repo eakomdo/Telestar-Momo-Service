@@ -16,9 +16,9 @@ def load_customer_data():
                 if line.strip():
                     parts = line.strip().split(',', 1)
                     if len(parts) >= 2:
-                        phone_number = parts[0].strip().strip('"').strip("'")
+                        phone_num = parts[0].strip().strip('"').strip("'")
                         name = parts[1].strip().strip('"').strip("'")
-                        customer_data[phone_number] = name
+                        customer_data[phone_num] = name
                     else:
                         print(f"Warning: Line {i} has unexpected format: {line.strip()}")
         print(f"Successfully loaded {len(customer_data)} customers")
@@ -82,19 +82,19 @@ def generate_updated_code():
     return customer_data, merchant_data
 
 if __name__ == "__main__":
-    customer_data, merchant_data = generate_updated_code()
+    customers, merchants = generate_updated_code()
 
-    print(f"\nTotal customers: {len(customer_data)}")
-    print(f"Total merchants: {len(merchant_data)}")
+    print(f"\nTotal customers: {len(customers)}")
+    print(f"Total merchants: {len(merchants)}")
 
     # Show some examples for testing
     print("\n=== TEST EXAMPLES ===")
-    customer_phone_numbers = list(customer_data.keys())[:5]
+    customer_phone_list = list(customers.keys())[:5]
     print("Customer phone numbers to try:")
-    for phone_num in customer_phone_numbers:
-        print(f"  {phone_num} -> {customer_data[phone_num]}")
+    for phone_number in customer_phone_list:
+        print(f"  {phone_number} -> {customers[phone_number]}")
 
-    merchant_ids = list(merchant_data.keys())[:5]
+    merchant_id_list = list(merchants.keys())[:5]
     print("\nMerchant IDs to try:")
-    for merchant_id in merchant_ids:
-        print(f"  {merchant_id} -> {merchant_data[merchant_id]}")
+    for merchant_code in merchant_id_list:
+        print(f"  {merchant_code} -> {merchants[merchant_code]}")
