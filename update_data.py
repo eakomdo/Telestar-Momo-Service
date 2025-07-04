@@ -33,6 +33,7 @@ def load_customer_data():
 
     return customer_data
 
+
 def load_merchant_data():
     """Load merchant data from CSV file"""
     merchant_data = {}
@@ -62,6 +63,7 @@ def load_merchant_data():
 
     return merchant_data
 
+
 def generate_updated_code():
     """Generate the updated dictionaries for the main application"""
     customer_data = load_customer_data()
@@ -80,6 +82,7 @@ def generate_updated_code():
     print("}")
 
     return customer_data, merchant_data
+
 
 if __name__ == "__main__":
     customers, merchants = generate_updated_code()
