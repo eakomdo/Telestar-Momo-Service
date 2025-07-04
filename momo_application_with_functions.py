@@ -1,6 +1,91 @@
 
 # Problem Set 2, MOMO Application with Functions
 
+# Global transaction history
+transaction_history = []
+
+def add_transaction(transaction_type, amount, charges, balance_after, recipient="Owner"):
+    """Add a transaction to the global history"""
+    import datetime
+    transaction = {
+        "timestamp": datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+        "type": transaction_type,
+        "amount": amount,
+        "charges": charges,
+        "balance_after": balance_after,
+        "status": "Success",
+        "recipient": recipient
+    }
+    transaction_history.append(transaction)
+
+def load_customer_data():
+    """Load customer data from CSV file"""
+    customers = {}
+    try:
+        with open('telestar_customer_list.csv', 'r', encoding='utf-8') as f:
+            lines = f.readlines()
+            for line in lines[1:]:  # Skip header
+                if line.strip():
+                    parts = line.strip().split(',', 1)
+                    if len(parts) >= 2:
+                        phone = parts[0].strip().strip('"').strip("'")
+                        name = parts[1].strip().strip('"').strip("'")
+                        customers[phone] = name
+    except FileNotFoundError:
+        print("Customer data file not found. Using default data.")
+        # Fallback to default data
+        customers = {
+            "0594131924": "ADOMAKO, Kwabena Baafi",
+            "0591847222": "ASARE, Solomon",
+            "0591861522": "TEYE, Terrance Siaw",
+            "0594130424": "ABBAN, Joshua Ewudzie",
+            "0594130524": "ABDUL-LATIF, Suadik Naani",
+            "0594130624": "ABDULAI, Hamsaud Ajaasuma",
+            "0594130724": "ABIWU, Nunya Komla",
+            "0594130824": "ABORAH, Michael Kwadwo",
+            "0594130924": "ACHEAMPONG, Nathaniel Kofi",
+            "0594131024": "ACKLOH, Perfect"
+        }
+    except Exception as e:
+        print(f"Error loading customer data: {e}")
+        customers = {}
+    
+    return customers
+
+def load_merchant_data():
+    """Load merchant data from CSV file"""
+    merchants = {}
+    try:
+        with open('merchant_list.csv', 'r', encoding='utf-8') as f:
+            lines = f.readlines()
+            for line in lines[1:]:  # Skip header
+                if line.strip():
+                    parts = line.strip().split(',', 1)
+                    if len(parts) >= 2:
+                        vendor_id = parts[0].strip().strip('"').strip("'")
+                        vendor_name = parts[1].strip().strip('"').strip("'")
+                        merchants[vendor_id] = vendor_name
+    except FileNotFoundError:
+        print("Merchant data file not found. Using default data.")
+        # Fallback to default data
+        merchants = {
+            "880931": "Arhin's Bakeries",
+            "556432": "Continental Supermarket",
+            "110088": "Blue and Dewey's Laundry Service",
+            "554411": "Check-List Event Planning and Organizing Ventures",
+            "456732": "Eve and Apple Soft Drinks",
+            "550831": "Kara Cosmetics",
+            "565644": "Isaiah's Laptop Repair Services",
+            "232277": "Ma Bo Wo Din Enterprises",
+            "567833": "Maa Joyce Chop Bar",
+            "660984": "Shawarma Boiz"
+        }
+    except Exception as e:
+        print(f"Error loading merchant data: {e}")
+        merchants = {}
+    
+    return merchants
+
 # -----------------------------------
 # Helper code
 # You don't need to understand this helper code,
@@ -18,14 +103,8 @@ def transfer_money(account_balance, password):
     Returns account_balance
     '''
     
-    # Telestar customer database (sample data)
-    telestar_customers = {
-        "05920979359": "ABASS, Osman",
-        "05923456789": "MENSAH, Kwame",
-        "05934567890": "ASANTE, Grace",
-        "05945678901": "OPPONG, Samuel",
-        "05956789012": "BOATENG, Mary"
-    }
+    # Load customer data from CSV file
+    telestar_customers = load_customer_data()
     
     print("Transfer Money:")
     print("1. TeleStar Network")
@@ -38,8 +117,9 @@ def transfer_money(account_balance, password):
                 break
             else:
                 print("Invalid choice. Please enter 1 or 2.")
-        except:
-            print("Invalid input. Please try again.")
+        except KeyboardInterrupt:
+            print("\nOperation cancelled.")
+            return account_balance
     
     if choice == "1":
         # TeleStar Network Transfer
@@ -52,11 +132,15 @@ def transfer_money(account_balance, password):
                 else:
                     print("Phone numbers don't match. Please try again.")
             else:
-                print("Invalid phone number. Must start with 059 and be 11 digits long.")
+                print("Invalid phone number. Must start with 059 and be 10 digits long.")
         
         # Check if phone exists in Telestar network
         if phone not in telestar_customers:
             print("Phone number not found in TeleStar network.")
+            print("Available phone numbers start with:")
+            sample_phones = list(telestar_customers.keys())[:5]
+            for sample_phone in sample_phones:
+                print(f"  {sample_phone}")
             return account_balance
         
         customer_name = telestar_customers[phone]
@@ -98,6 +182,9 @@ def transfer_money(account_balance, password):
         print(f"GHS {amount} has been sent successfully to {customer_name}, with E-levy charge of GHS{e_levy:.1f}")
         print(f"Service charge: GHS {service_charge}")
         print(f"New balance: GHS {account_balance:.1f}")
+        
+        # Record transaction
+        add_transaction("Money Transfer", amount, e_levy + service_charge, account_balance, customer_name)
         
     else:
         # Other Networks Transfer (simplified implementation)
@@ -149,14 +236,8 @@ def momopay_paybill(account_balance):
     Returns account_balance
     '''
     
-    # Merchant database (sample data)
-    merchants = {
-        "558032": "ALL IS WELL BAKERIES",
-        "123456": "TECH SOLUTIONS LTD",
-        "789012": "GOLDEN FOODS",
-        "345678": "EVERGREEN ENTERPRISE",
-        "901234": "SMART ELECTRONICS"
-    }
+    # Load merchant data from CSV file
+    merchants = load_merchant_data()
     
     print("MomoPay/Paybill:")
     
@@ -169,6 +250,10 @@ def momopay_paybill(account_balance):
                 break
             else:
                 print("Merchant ID not found. Please try again.")
+                print("Available Merchant IDs:")
+                sample_merchants = list(merchants.keys())[:5]
+                for sample_id in sample_merchants:
+                    print(f"  {sample_id} -> {merchants[sample_id]}")
         else:
             print("Invalid Merchant ID. Must be 6 digits.")
     
@@ -199,6 +284,9 @@ def momopay_paybill(account_balance):
     
     print(f"GHS {amount} has been paid successfully to {merchant_name}, with E-levy charge of GHS {e_levy:.1f}.")
     print(f"New balance: GHS {account_balance:.1f}")
+    
+    # Record transaction
+    add_transaction("MomoPay Payment", amount, e_levy, account_balance, merchant_name)
     
     return account_balance
 
@@ -332,14 +420,8 @@ def allow_cashout(account_balance, password):
     
     import random
     
-    # Merchant database (same as momopay)
-    merchants = {
-        "558032": "ALL IS WELL BAKERIES",
-        "123456": "TECH SOLUTIONS LTD",
-        "789012": "GOLDEN FOODS",
-        "345678": "EVERGREEN ENTERPRISE",
-        "901234": "SMART ELECTRONICS"
-    }
+    # Load merchant data from CSV file
+    merchants = load_merchant_data()
     
     print("Allow CashOut:")
     print("1. Yes")
@@ -352,8 +434,9 @@ def allow_cashout(account_balance, password):
                 break
             else:
                 print("Invalid choice. Please enter 1 or 2.")
-        except:
-            print("Invalid input. Please try again.")
+        except KeyboardInterrupt:
+            print("\nOperation cancelled.")
+            return account_balance
     
     if choice == "2":
         print("CashOut cancelled.")
@@ -395,6 +478,9 @@ def allow_cashout(account_balance, password):
     print(f"Cash Out made for GHS {random_amount:.2f} to {random_merchant}. CashOut Fee GHS{cashout_fee:.2f} was charged automatically from your wallet.")
     print(f"Current Balance: GHS{account_balance:.2f}")
     
+    # Record transaction
+    add_transaction("Cash out", random_amount, cashout_fee, account_balance)
+    
     return account_balance
 
 
@@ -406,10 +492,6 @@ def my_wallet(account_balance, password):
     Allows users to top up, view transaction history and change pin
     Returns account_balance, password
     '''
-    
-    # Global variable to store transaction history
-    if not hasattr(my_wallet, 'transaction_history'):
-        my_wallet.transaction_history = []
     
     print("My Wallet:")
     print("1. Top Up Balance")
@@ -443,17 +525,7 @@ def my_wallet(account_balance, password):
         print(f"Balance top up is successful. New balance: GHS {account_balance:.1f}")
         
         # Record transaction
-        import datetime
-        transaction = {
-            "timestamp": datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
-            "type": "Account Topup",
-            "amount": amount,
-            "charges": 0.00,
-            "balance_after": account_balance,
-            "status": "Success",
-            "recipient": "Owner"
-        }
-        my_wallet.transaction_history.append(transaction)
+        add_transaction("Account Topup", amount, 0.00, account_balance)
     
     elif choice == "2":
         # Check Balance
@@ -480,20 +552,21 @@ def my_wallet(account_balance, password):
     elif choice == "4":
         # Transaction History
         print("Transaction History:")
-        print("-" * 79)
+        print("-" * 80)
         
-        if not my_wallet.transaction_history:
+        if not transaction_history:
             print("No transactions found.")
         else:
-            for transaction in my_wallet.transaction_history:
-                print(f"Timestamp    : {transaction['timestamp']}")
-                print(f"Type         : {transaction['type']}")
-                print(f"Amount (GHS) : {transaction['amount']:.2f}")
-                print(f"Charges (GHS): {transaction['charges']:.2f}")
-                print(f"Balance After: {transaction['balance_after']:.2f}")
-                print(f"Status       : {transaction['status']}")
-                print(f"Recipient    : {transaction['recipient']}")
-                print("-" * 79)
+            for transaction in transaction_history:
+                print(f"Timestamp        : {transaction['timestamp']}")
+                print(f"Type            : {transaction['type']}")
+                print(f"Amount (GHS)    : {transaction['amount']:.2f}")
+                print(f"Charges (GHS)   : {transaction['charges']:.2f}")
+                print()
+                print(f"Balance After   : {transaction['balance_after']:.2f}")
+                print(f"Status          : {transaction['status']}")
+                print(f"Recipient       : {transaction['recipient']}")
+                print("-" * 80)
     
     return account_balance, password
 
@@ -508,7 +581,7 @@ def main():
 
         hashcode = input("Enter the TeleStar code: ")
         # Check if the entered code is correct
-        if hashcode == "*170#":
+        if hashcode == "*150#":
             while True:
 
                 # Display main menu
