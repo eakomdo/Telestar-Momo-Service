@@ -1,12 +1,20 @@
 
 # Problem Set 2, MOMO Application with Functions
 
+"""
+Telestar Mobile Money Application
+A comprehensive mobile money service with modular functions
+"""
+
+import datetime
+import random
+
 # Global transaction history
-transaction_history = []
+TRANSACTION_HISTORY = []
+
 
 def add_transaction(transaction_type, amount, charges, balance_after, recipient="Owner"):
     """Add a transaction to the global history"""
-    import datetime
     transaction = {
         "timestamp": datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
         "type": transaction_type,
@@ -16,21 +24,21 @@ def add_transaction(transaction_type, amount, charges, balance_after, recipient=
         "status": "Success",
         "recipient": recipient
     }
-    transaction_history.append(transaction)
+    TRANSACTION_HISTORY.append(transaction)
 
 def load_customer_data():
     """Load customer data from CSV file"""
     customers = {}
     try:
-        with open('telestar_customer_list.csv', 'r', encoding='utf-8') as f:
-            lines = f.readlines()
+        with open('telestar_customer_list.csv', 'r', encoding='utf-8') as file:
+            lines = file.readlines()
             for line in lines[1:]:  # Skip header
                 if line.strip():
                     parts = line.strip().split(',', 1)
                     if len(parts) >= 2:
-                        phone = parts[0].strip().strip('"').strip("'")
-                        name = parts[1].strip().strip('"').strip("'")
-                        customers[phone] = name
+                        phone_number = parts[0].strip().strip('"').strip("'")
+                        customer_name = parts[1].strip().strip('"').strip("'")
+                        customers[phone_number] = customer_name
     except FileNotFoundError:
         print("Customer data file not found. Using default data.")
         # Fallback to default data
@@ -46,8 +54,8 @@ def load_customer_data():
             "0594130924": "ACHEAMPONG, Nathaniel Kofi",
             "0594131024": "ACKLOH, Perfect"
         }
-    except Exception as e:
-        print(f"Error loading customer data: {e}")
+    except (UnicodeDecodeError, PermissionError) as error:
+        print(f"Error loading customer data: {error}")
         customers = {}
     
     return customers
@@ -56,8 +64,8 @@ def load_merchant_data():
     """Load merchant data from CSV file"""
     merchants = {}
     try:
-        with open('merchant_list.csv', 'r', encoding='utf-8') as f:
-            lines = f.readlines()
+        with open('merchant_list.csv', 'r', encoding='utf-8') as file:
+            lines = file.readlines()
             for line in lines[1:]:  # Skip header
                 if line.strip():
                     parts = line.strip().split(',', 1)
@@ -80,8 +88,8 @@ def load_merchant_data():
             "567833": "Maa Joyce Chop Bar",
             "660984": "Shawarma Boiz"
         }
-    except Exception as e:
-        print(f"Error loading merchant data: {e}")
+    except (UnicodeDecodeError, PermissionError) as error:
+        print(f"Error loading merchant data: {error}")
         merchants = {}
     
     return merchants
@@ -311,7 +319,7 @@ def airtime_bundle(account_balance):
                 break
             else:
                 print("Invalid choice. Please enter 1 or 2.")
-        except Exception:
+        except (ValueError, KeyboardInterrupt):
             print("Invalid input. Please try again.")
     
     if choice == "1":
@@ -435,8 +443,6 @@ def allow_cashout(account_balance, password):
     Customers then authorize cashout prompt with pin
     Returns account_balance
     '''
-    
-    import random
     
     # Load merchant data from CSV file
     merchants = load_merchant_data()
@@ -572,10 +578,10 @@ def my_wallet(account_balance, password):
         print("Transaction History:")
         print("-" * 80)
         
-        if not transaction_history:
+        if not TRANSACTION_HISTORY:
             print("No transactions found.")
         else:
-            for transaction in transaction_history:
+            for transaction in TRANSACTION_HISTORY:
                 print(f"Timestamp        : {transaction['timestamp']}")
                 print(f"Type            : {transaction['type']}")
                 print(f"Amount (GHS)    : {transaction['amount']:.2f}")

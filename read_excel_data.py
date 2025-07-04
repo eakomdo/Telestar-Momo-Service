@@ -14,7 +14,7 @@ def read_excel_as_csv():
     try:
         # Check if libreoffice is available
         check_result = subprocess.run(['which', 'libreoffice'], 
-                                    capture_output=True, text=True)
+                                    capture_output=True, text=True, check=False)
         if check_result.returncode != 0:
             print("LibreOffice not found. Trying alternative methods...")
             return False
@@ -23,14 +23,14 @@ def read_excel_as_csv():
         
         # Try libreoffice conversion
         result1 = subprocess.run(['libreoffice', '--headless', '--convert-to', 'csv', 'telestar_customer_list.xlsx'], 
-                              capture_output=True, text=True, timeout=30)
+                              capture_output=True, text=True, timeout=30, check=False)
         if result1.returncode == 0:
             print("✓ Converted customer Excel to CSV")
         else:
             print(f"✗ Failed to convert customer Excel: {result1.stderr}")
             
         result2 = subprocess.run(['libreoffice', '--headless', '--convert-to', 'csv', 'merchant_list.xlsx'], 
-                              capture_output=True, text=True, timeout=30)
+                              capture_output=True, text=True, timeout=30, check=False)
         if result2.returncode == 0:
             print("✓ Converted merchant Excel to CSV")
         else:
@@ -78,7 +78,7 @@ def read_excel_as_csv():
     except PermissionError as e:
         print(f"Error: Permission denied - {e}")
         return False
-    except Exception as e:
+    except (OSError, subprocess.SubprocessError) as e:
         print(f"Unexpected error converting Excel files: {e}")
         import traceback
         traceback.print_exc()
