@@ -226,6 +226,9 @@ def transfer_money(account_balance, password):
         print(f"GHS {amount} has been sent successfully to {phone}, with E-levy charge of GHS{e_levy:.1f}")
         print(f"Service charge: GHS {service_charge}")
         print(f"New balance: GHS {account_balance:.1f}")
+        
+        # Record transaction for other networks
+        add_transaction("Money Transfer", amount, e_levy + service_charge, account_balance, phone)
     
     return account_balance
 
@@ -330,6 +333,9 @@ def airtime_bundle(account_balance):
         account_balance -= amount
         print(f"GHS {amount} airtime successfully purchased.")
         print(f"New balance: GHS {account_balance:.1f}")
+        
+        # Record transaction
+        add_transaction("Airtime Purchase", amount, 0.00, account_balance)
     
     elif choice == "2":
         # Buy Bundles
@@ -346,7 +352,7 @@ def airtime_bundle(account_balance):
                     break
                 else:
                     print("Invalid choice. Please enter 1, 2, 3, or 4.")
-            except:
+            except (ValueError, KeyboardInterrupt):
                 print("Invalid input. Please try again.")
         
         if bundle_choice == "1":
@@ -359,6 +365,9 @@ def airtime_bundle(account_balance):
             account_balance -= amount
             print(f"{data_mb} MB Data Bundle successfully purchased.")
             print(f"New balance: GHS {account_balance:.1f}")
+            
+            # Record transaction
+            add_transaction("Data Bundle Purchase", amount, 0.00, account_balance)
         
         elif bundle_choice == "2":
             # GHC 10 bundle
@@ -370,6 +379,9 @@ def airtime_bundle(account_balance):
             account_balance -= amount
             print(f"{data_mb} MB Data Bundle successfully purchased.")
             print(f"New balance: GHS {account_balance:.1f}")
+            
+            # Record transaction
+            add_transaction("Data Bundle Purchase", amount, 0.00, account_balance)
         
         elif bundle_choice == "3":
             # GHC 100 bundle
@@ -381,6 +393,9 @@ def airtime_bundle(account_balance):
             account_balance -= amount
             print(f"{data_gb} GB Data Bundle successfully purchased.")
             print(f"New balance: GHS {account_balance:.1f}")
+            
+            # Record transaction
+            add_transaction("Data Bundle Purchase", amount, 0.00, account_balance)
         
         elif bundle_choice == "4":
             # Flexi-Bundle
@@ -406,6 +421,9 @@ def airtime_bundle(account_balance):
             account_balance -= amount
             print(f"{total_data_mb:.1f} MB Data Bundle successfully purchased.")
             print(f"New balance: GHS {account_balance:.1f}")
+            
+            # Record transaction
+            add_transaction("Flexi-Bundle Purchase", amount, 0.00, account_balance)
     
     return account_balance
 
@@ -506,7 +524,7 @@ def my_wallet(account_balance, password):
                 break
             else:
                 print("Invalid choice. Please enter 1, 2, 3, or 4.")
-        except:
+        except (ValueError, KeyboardInterrupt):
             print("Invalid input. Please try again.")
     
     if choice == "1":
@@ -581,7 +599,7 @@ def main():
 
         hashcode = input("Enter the TeleStar code: ")
         # Check if the entered code is correct
-        if hashcode == "*150#":
+        if hashcode == "*170#":
             while True:
 
                 # Display main menu
