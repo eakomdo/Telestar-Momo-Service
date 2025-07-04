@@ -3,6 +3,7 @@
 Script to load actual customer and merchant data from CSV files
 """
 
+
 def load_customer_data():
     """Load customer data from CSV file"""
     customers = {}
