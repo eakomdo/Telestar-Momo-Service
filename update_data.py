@@ -6,7 +6,7 @@ Script to load actual customer and merchant data from CSV files
 
 def load_customer_data():
     """Load customer data from CSV file"""
-    customers = {}
+    customer_data = {}
     try:
         print("Loading customer data...")
         with open('telestar_customer_list.csv', 'r', encoding='utf-8') as f:
@@ -16,26 +16,26 @@ def load_customer_data():
                 if line.strip():
                     parts = line.strip().split(',', 1)
                     if len(parts) >= 2:
-                        phone = parts[0].strip().strip('"').strip("'")
+                        phone_number = parts[0].strip().strip('"').strip("'")
                         name = parts[1].strip().strip('"').strip("'")
-                        customers[phone] = name
+                        customer_data[phone_number] = name
                     else:
                         print(f"Warning: Line {i} has unexpected format: {line.strip()}")
-        print(f"Successfully loaded {len(customers)} customers")
+        print(f"Successfully loaded {len(customer_data)} customers")
     except FileNotFoundError:
         print("Error: telestar_customer_list.csv not found")
     except UnicodeDecodeError as e:
         print(f"Error reading customer file - encoding issue: {e}")
-    except Exception as e:
-        print(f"Unexpected error loading customer data: {e}")
+    except (OSError, IOError) as e:
+        print(f"Error loading customer data: {e}")
         import traceback
         traceback.print_exc()
-    
-    return customers
+
+    return customer_data
 
 def load_merchant_data():
     """Load merchant data from CSV file"""
-    merchants = {}
+    merchant_data = {}
     try:
         print("Loading merchant data...")
         with open('merchant_list.csv', 'r', encoding='utf-8') as f:
@@ -47,20 +47,20 @@ def load_merchant_data():
                     if len(parts) >= 2:
                         vendor_id = parts[0].strip().strip('"').strip("'")
                         vendor_name = parts[1].strip().strip('"').strip("'")
-                        merchants[vendor_id] = vendor_name
+                        merchant_data[vendor_id] = vendor_name
                     else:
                         print(f"Warning: Line {i} has unexpected format: {line.strip()}")
-        print(f"Successfully loaded {len(merchants)} merchants")
+        print(f"Successfully loaded {len(merchant_data)} merchants")
     except FileNotFoundError:
         print("Error: merchant_list.csv not found")
     except UnicodeDecodeError as e:
         print(f"Error reading merchant file - encoding issue: {e}")
-    except Exception as e:
-        print(f"Unexpected error loading merchant data: {e}")
+    except (OSError, IOError) as e:
+        print(f"Error loading merchant data: {e}")
         import traceback
         traceback.print_exc()
-    
-    return merchants
+
+    return merchant_data
 
 def generate_updated_code():
     """Generate the updated dictionaries for the main application"""
