@@ -308,7 +308,7 @@ def airtime_bundle(account_balance):
                 break
             else:
                 print("Invalid choice. Please enter 1 or 2.")
-        except:
+        except Exception:
             print("Invalid input. Please try again.")
     
     if choice == "1":

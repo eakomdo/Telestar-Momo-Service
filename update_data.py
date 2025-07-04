@@ -7,17 +7,28 @@ def load_customer_data():
     """Load customer data from CSV file"""
     customers = {}
     try:
-        with open('telestar_customer_list.csv', 'r') as f:
+        print("Loading customer data...")
+        with open('telestar_customer_list.csv', 'r', encoding='utf-8') as f:
             lines = f.readlines()
-            for line in lines[1:]:  # Skip header
+            print(f"Found {len(lines)} lines in customer file")
+            for i, line in enumerate(lines[1:], 2):  # Skip header, start from line 2
                 if line.strip():
                     parts = line.strip().split(',', 1)
                     if len(parts) >= 2:
-                        phone = parts[0].strip()
-                        name = parts[1].strip().strip('"')
+                        phone = parts[0].strip().strip('"').strip("'")
+                        name = parts[1].strip().strip('"').strip("'")
                         customers[phone] = name
+                    else:
+                        print(f"Warning: Line {i} has unexpected format: {line.strip()}")
+        print(f"Successfully loaded {len(customers)} customers")
+    except FileNotFoundError:
+        print("Error: telestar_customer_list.csv not found")
+    except UnicodeDecodeError as e:
+        print(f"Error reading customer file - encoding issue: {e}")
     except Exception as e:
-        print(f"Error loading customer data: {e}")
+        print(f"Unexpected error loading customer data: {e}")
+        import traceback
+        traceback.print_exc()
     
     return customers
 
@@ -25,17 +36,28 @@ def load_merchant_data():
     """Load merchant data from CSV file"""
     merchants = {}
     try:
-        with open('merchant_list.csv', 'r') as f:
+        print("Loading merchant data...")
+        with open('merchant_list.csv', 'r', encoding='utf-8') as f:
             lines = f.readlines()
-            for line in lines[1:]:  # Skip header
+            print(f"Found {len(lines)} lines in merchant file")
+            for i, line in enumerate(lines[1:], 2):  # Skip header, start from line 2
                 if line.strip():
                     parts = line.strip().split(',', 1)
                     if len(parts) >= 2:
-                        vendor_id = parts[0].strip()
-                        vendor_name = parts[1].strip().strip('"')
+                        vendor_id = parts[0].strip().strip('"').strip("'")
+                        vendor_name = parts[1].strip().strip('"').strip("'")
                         merchants[vendor_id] = vendor_name
+                    else:
+                        print(f"Warning: Line {i} has unexpected format: {line.strip()}")
+        print(f"Successfully loaded {len(merchants)} merchants")
+    except FileNotFoundError:
+        print("Error: merchant_list.csv not found")
+    except UnicodeDecodeError as e:
+        print(f"Error reading merchant file - encoding issue: {e}")
     except Exception as e:
-        print(f"Error loading merchant data: {e}")
+        print(f"Unexpected error loading merchant data: {e}")
+        import traceback
+        traceback.print_exc()
     
     return merchants
 

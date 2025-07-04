@@ -8,34 +8,80 @@ def read_excel_as_csv():
     import subprocess
     import os
     
+    print("Attempting to convert Excel files to CSV...")
+    
     # Try to convert Excel to CSV using available tools
     try:
-        # Try libreoffice if available
-        result = subprocess.run(['libreoffice', '--headless', '--convert-to', 'csv', 'telestar_customer_list.xlsx'], 
-                              capture_output=True, text=True)
-        if result.returncode == 0:
-            print("Converted customer Excel to CSV")
+        # Check if libreoffice is available
+        check_result = subprocess.run(['which', 'libreoffice'], 
+                                    capture_output=True, text=True)
+        if check_result.returncode != 0:
+            print("LibreOffice not found. Trying alternative methods...")
+            return False
+        
+        print("LibreOffice found. Converting files...")
+        
+        # Try libreoffice conversion
+        result1 = subprocess.run(['libreoffice', '--headless', '--convert-to', 'csv', 'telestar_customer_list.xlsx'], 
+                              capture_output=True, text=True, timeout=30)
+        if result1.returncode == 0:
+            print("✓ Converted customer Excel to CSV")
+        else:
+            print(f"✗ Failed to convert customer Excel: {result1.stderr}")
             
-        result = subprocess.run(['libreoffice', '--headless', '--convert-to', 'csv', 'merchant_list.xlsx'], 
-                              capture_output=True, text=True)
-        if result.returncode == 0:
-            print("Converted merchant Excel to CSV")
+        result2 = subprocess.run(['libreoffice', '--headless', '--convert-to', 'csv', 'merchant_list.xlsx'], 
+                              capture_output=True, text=True, timeout=30)
+        if result2.returncode == 0:
+            print("✓ Converted merchant Excel to CSV")
+        else:
+            print(f"✗ Failed to convert merchant Excel: {result2.stderr}")
             
-        # Read the CSV files
+        # Read the CSV files with proper encoding
         if os.path.exists('telestar_customer_list.csv'):
             print("\n=== CUSTOMER DATA ===")
-            with open('telestar_customer_list.csv', 'r') as f:
-                for i, line in enumerate(f.readlines()[:10]):
-                    print(f"Row {i+1}: {line.strip()}")
+            try:
+                with open('telestar_customer_list.csv', 'r', encoding='utf-8') as f:
+                    lines = f.readlines()[:10]
+                    for i, line in enumerate(lines):
+                        print(f"Row {i+1}: {line.strip()}")
+            except UnicodeDecodeError:
+                print("Encoding issue with customer CSV. Trying different encoding...")
+                with open('telestar_customer_list.csv', 'r', encoding='latin-1') as f:
+                    lines = f.readlines()[:10]
+                    for i, line in enumerate(lines):
+                        print(f"Row {i+1}: {line.strip()}")
+        else:
+            print("Customer CSV file not found after conversion")
                     
         if os.path.exists('merchant_list.csv'):
             print("\n=== MERCHANT DATA ===")
-            with open('merchant_list.csv', 'r') as f:
-                for i, line in enumerate(f.readlines()[:10]):
-                    print(f"Row {i+1}: {line.strip()}")
-                    
+            try:
+                with open('merchant_list.csv', 'r', encoding='utf-8') as f:
+                    lines = f.readlines()[:10]
+                    for i, line in enumerate(lines):
+                        print(f"Row {i+1}: {line.strip()}")
+            except UnicodeDecodeError:
+                print("Encoding issue with merchant CSV. Trying different encoding...")
+                with open('merchant_list.csv', 'r', encoding='latin-1') as f:
+                    lines = f.readlines()[:10]
+                    for i, line in enumerate(lines):
+                        print(f"Row {i+1}: {line.strip()}")
+        else:
+            print("Merchant CSV file not found after conversion")
+            
+    except subprocess.TimeoutExpired:
+        print("Error: LibreOffice conversion timed out")
+        return False
+    except FileNotFoundError as e:
+        print(f"Error: Required file not found - {e}")
+        return False
+    except PermissionError as e:
+        print(f"Error: Permission denied - {e}")
+        return False
     except Exception as e:
-        print(f"Error converting Excel files: {e}")
+        print(f"Unexpected error converting Excel files: {e}")
+        import traceback
+        traceback.print_exc()
         return False
     
     return True
