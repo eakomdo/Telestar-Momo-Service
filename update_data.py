@@ -64,37 +64,37 @@ def load_merchant_data():
 
 def generate_updated_code():
     """Generate the updated dictionaries for the main application"""
-    customers = load_customer_data()
-    merchants = load_merchant_data()
-    
+    customer_data = load_customer_data()
+    merchant_data = load_merchant_data()
+
     print("=== UPDATED CUSTOMER DATA ===")
     print("telestar_customers = {")
-    for phone, name in list(customers.items())[:20]:  # Show first 20
-        print(f'    "{phone}": "{name}",')
+    for phone_num, customer_name in list(customer_data.items())[:20]:  # Show first 20
+        print(f'    "{phone_num}": "{customer_name}",')
     print("}")
-    
+
     print("\n=== UPDATED MERCHANT DATA ===")
     print("merchants = {")
-    for vendor_id, vendor_name in merchants.items():
+    for vendor_id, vendor_name in merchant_data.items():
         print(f'    "{vendor_id}": "{vendor_name}",')
     print("}")
-    
-    return customers, merchants
+
+    return customer_data, merchant_data
 
 if __name__ == "__main__":
-    customers, merchants = generate_updated_code()
-    
-    print(f"\nTotal customers: {len(customers)}")
-    print(f"Total merchants: {len(merchants)}")
-    
+    customer_data, merchant_data = generate_updated_code()
+
+    print(f"\nTotal customers: {len(customer_data)}")
+    print(f"Total merchants: {len(merchant_data)}")
+
     # Show some examples for testing
     print("\n=== TEST EXAMPLES ===")
-    customer_phones = list(customers.keys())[:5]
+    customer_phone_numbers = list(customer_data.keys())[:5]
     print("Customer phone numbers to try:")
-    for phone in customer_phones:
-        print(f"  {phone} -> {customers[phone]}")
-    
-    merchant_ids = list(merchants.keys())[:5]
+    for phone_num in customer_phone_numbers:
+        print(f"  {phone_num} -> {customer_data[phone_num]}")
+
+    merchant_ids = list(merchant_data.keys())[:5]
     print("\nMerchant IDs to try:")
     for merchant_id in merchant_ids:
-        print(f"  {merchant_id} -> {merchants[merchant_id]}")
+        print(f"  {merchant_id} -> {merchant_data[merchant_id]}")
