@@ -609,7 +609,7 @@ def main():
 
         hashcode = input("Enter the TeleStar code: ")
         # Check if the entered code is correct
-        if hashcode == "*150#":
+        if hashcode == "*170#":
             while True:
 
                 # Display main menu
